@@ -1,0 +1,14 @@
+version: '3'
+services:
+  budget_karelia_backend:
+    build: ./backend
+    container_name: budget_backend
+    environment:
+      - PYTHONUNBUFFERED=True
+    # Перезапускаем сервис в случае падения 
+    restart: on-failure
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "5000:5000"
+    command: gunicorn main:"create_flask_app()" -b 0.0.0.0:5000 --reload
