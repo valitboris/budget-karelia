@@ -5,10 +5,13 @@ services:
     container_name: budget_backend
     environment:
       - PYTHONUNBUFFERED=True
+      - VIRTUAL_HOST=bugget-karelia.roskvartal.ru, www.bugget-karelia.roskvartal.ru
+      - LETSENCRYPT_HOST=bugget-karelia.roskvartal.ru
+      - LETSENCRYPT_EMAIL=vladimirowant@yandex.ru
     # Перезапускаем сервис в случае падения 
     restart: on-failure
+    ports:
+      - 5000:5000
     volumes:
       - ./backend:/backend
-    ports:
-      - "5000:5000"
     command: gunicorn main:"create_flask_app()" -b 0.0.0.0:5000 --reload

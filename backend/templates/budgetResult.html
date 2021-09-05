@@ -1,5 +1,71 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-EBAT
+<div id="app" class="container">
+    <div class="h1 text-center my-5">Прогноз бюджета Республики Карелия</div>
+
+    <div class="row h6">
+        <div class="col-3 m-1 text-left">Статьи бюджета</div>
+        <div class="col text-center bg-light">Факт</div>
+        <div class="col text-center bg-info">Прогноз МинФина РК</div>
+        <div class="col text-center bg-info">План/факт</div>
+        <div class="col text-center bg-success">Прогноз bugGetAI</div>
+        <div class="col text-center bg-success">План/факт</div>
+    </div>
+
+    <div v-for="k,index in koefs" class="row">
+        <div class="col-3 m-1 text-left">{{ koefs[index][0] }} </div>
+        <div class="col text-center bg-light">{{ fact[index] }}</div>
+        <div class="col text-center bg-info">{{ plan1[index] }}</div>
+        <div class="col text-center bg-info">{{ delta1[index] }}</div>
+        <div class="col text-center bg-success">{{ plan2[index] }}</div>
+        <div class="col text-center bg-success">{{ delta2[index] }}</div>
+    </div>
+    
+</div>
+<script src="https://unpkg.com/vue@next"></script>
+<script>
+Vue.createApp({
+  data() {
+    return {
+
+        // Сюда данные из загруженной пользователем Excel'ки: [] убрать, вставить одномерный массив, названия статей доходов должны совпадать!
+        // ФАКТ ВЫБРАННОГО ГОДА
+        fact: {{ data1|tojson }},
+        // ПЛАН МИНФИНА выбранного года
+        plan1: {{ data2|tojson }},
+        delta1: [],
+        plan2: [],
+        delta2: [],
+        // Сюда должны попадать коэффицинты std из Даниных расчетов
+        koefs: [
+        ['НАЛОГИ НА ТОВАРЫ (РАБОТЫ, УСЛУГИ), РЕАЛИЗУЕМЫЕ ...', 0.15],
+        ['НАЛОГИ НА СОВОКУПНЫЙ ДОХОД                        ', 0.06],
+        ['НАЛОГИ НА ИМУЩЕСТВО                               ', 0.07],
+        ['НАЛОГИ, СБОРЫ И РЕГУЛЯРНЫЕ ПЛАТЕЖИ ЗА ПОЛЬЗОВАН...', 0.14],
+        ['ДОХОДЫ ОТ ИСПОЛЬЗОВАНИЯ ИМУЩЕСТВА, НАХОДЯЩЕГОСЯ...', 0.13],
+        ['ПЛАТЕЖИ ПРИ ПОЛЬЗОВАНИИ ПРИРОДНЫМИ РЕСУРСАМИ      ', 0.15],
+        ['ДОХОДЫ ОТ ПРОДАЖИ МАТЕРИАЛЬНЫХ И НЕМАТЕРИАЛЬНЫХ...', 0.40],
+        ['АДМИНИСТРАТИВНЫЕ ПЛАТЕЖИ И СБОРЫ                  ', 0.82],
+        ['ШТРАФЫ, САНКЦИИ, ВОЗМЕЩЕНИЕ УЩЕРБА                ', 0.21],
+        ['ПРОЧИЕ НЕНАЛОГОВЫЕ ДОХОДЫ                         ', 0.93],
+        ['БЕЗВОЗМЕЗДНЫЕ ПОСТУПЛЕНИЯ                         ', 0.10],
+        ['БЕЗВОЗМЕЗДНЫЕ ПОСТУПЛЕНИЯ ОТ ДРУГИХ БЮДЖЕТОВ БЮ...', 0.11],
+        ['ПРОЧИЕ БЕЗВОЗМЕЗДНЫЕ ПОСТУПЛЕНИЯ                  ', 0.56]]
+    }
+  },
+    methods:{
+    // методы-обработчики событий жизненного цикла
+    // помещаются вне параметра methods
+    },
+    beforeMount(){
+        for (let i=0; i<13; i++) {
+            this.delta1.push((this.fact[i]/this.plan1[i]).toFixed(4));
+            this.plan2.push(( this.fact[i] * (1 - this.koefs[i][1]) ).toFixed(2));
+            this.delta2.push((this.fact[i]/this.plan2[i]).toFixed(4));
+        };
+    },
+
+}).mount('#app');
+</script>
 {% endblock content %}
